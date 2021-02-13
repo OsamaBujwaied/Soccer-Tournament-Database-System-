@@ -1,0 +1,96 @@
+public class Match {
+    private String matchID;
+    private String date;
+    private String fieldID;
+    private String team1ID;
+    private String team2ID;
+    private String time;
+    private String team1Goals;
+    private String team2Goals;
+
+
+    public Match(String matchID,String date, String fieldID, String team1ID, String team2ID){
+        this.matchID = matchID;
+        this.date = date;
+        this.fieldID = fieldID;
+        this.team1ID = team1ID;
+        this.team2ID = team2ID;
+    }
+    public Match(String matchID, String date, String fieldID, String team1ID, String team2ID, String time,String team1Goals,String team2Goals){
+        this.matchID = matchID;
+        this.date = date;
+        this.fieldID = fieldID;
+        this.team1ID = team1ID;
+        this.team2ID = team2ID;
+        this.time = time;
+        this.team1Goals = team1Goals;
+        this.team2Goals = team2Goals;
+
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getFieldID() {
+        return fieldID;
+    }
+
+    public String getMatchID() {
+        return matchID;
+    }
+
+    public String getTeam1ID() {
+        return team1ID;
+    }
+
+    public String getTeam2ID() {
+        return team2ID;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setFieldID(String fieldID) {
+        this.fieldID = fieldID;
+    }
+
+    public void setMatchID(String matchID) {
+        this.matchID = matchID;
+    }
+
+    public void setTeam1ID(String team1ID) {
+        this.team1ID = team1ID;
+    }
+
+    public void setTeam2ID(String team2ID) {
+        this.team2ID = team2ID;
+    }
+    //copy 2/2
+
+    public String getTime() {
+        return time;
+    }
+
+    public String getTeam2Goals() {
+        return team2Goals;
+    }
+
+    public String getTeam1Goals() {
+        return team1Goals;
+    }
+
+    public void setTeam1Goals(String team1Goals) {
+        this.team1Goals = team1Goals;
+    }
+
+    public void setTeam2Goals(String team2Goals) {
+        this.team2Goals = team2Goals;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+}

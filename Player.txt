@@ -1,0 +1,211 @@
+CREATE TABLE IF NOT EXISTS `Tournament` (
+  `TorID` int(10) unsigned NOT NULL,
+  `Name` varchar(20) NOT NULL,
+  `Startdate` DATE NOT NULL,
+  `Enddate` DATE NOT NULL,
+  PRIMARY KEY (`TorID`)
+  ) DEFAULT CHARSET=utf8;
+
+INSERT INTO `Tournament` (`TorID`,`Name`,`Startdate`,`Enddate`) VALUES
+  ('1234','FOOTBALL',date '2013-10-10',date '2013-10-15'),
+  ('4321','BASKETBALL',date '2013-11-10',date '2013-11-15');
+
+
+
+CREATE TABLE IF NOT EXISTS `Team` (
+  `TeamID` int(10) unsigned NOT NULL,
+  `Name` varchar(20) NOT NULL,
+  PRIMARY KEY (`TeamID`)
+  ) DEFAULT CHARSET=utf8;
+  
+ INSERT INTO `Team` (`TeamID`,`Name`) VALUES
+ ('1','TEAM1'),
+ ('2','TEAM2'),
+ ('3','TEAM3'),
+ ('4','TEAM4');
+  
+  
+
+  CREATE TABLE IF NOT EXISTS `Field` (
+  `FieldID` int(10) unsigned NOT NULL,
+  `Name` varchar(20) NOT NULL,
+  `Description` varchar(200),
+  PRIMARY KEY (`FieldID`)
+  ) DEFAULT CHARSET=utf8;
+  
+  
+INSERT INTO `Field` VALUES
+('1','Field1',NULL),
+('2','Field2',NULL),
+('3','Field3',NULL),
+('4','Field4',NULL);
+
+CREATE TABLE IF NOT EXISTS `Match` (
+  `MatchID` int(10) unsigned NOT NULL,
+  `Team1ID` int(10) unsigned NOT NULL,
+  `Team2ID` int(10) unsigned NOT NULL,
+  `FieldID` int(10) unsigned NOT NULL,
+  `Date` DATE NOT NULL,
+  `Time` TIME NOT NULL,
+  `Team1Goals` int(2) unsigned NOT NULL,
+  `Team2Goals` int(2) unsigned NOT NULL,
+  `Comments` varchar(200),
+  PRIMARY KEY (`MatchID`),
+  FOREIGN KEY (Team1ID) REFERENCES Team(TeamID),
+  FOREIGN KEY (Team2ID) REFERENCES Team(TeamID),
+  FOREIGN KEY (FieldID) REFERENCES Field(FieldID)
+  
+  ) DEFAULT CHARSET=utf8;
+  
+INSERT INTO `Match` VALUES
+('1','1','2','1',date '2013-10-10',time '6:30:00','5','3',NULL),
+('2','3','4','4',date '2013-10-11',time '6:30:00','2','0',NULL);
+  
+CREATE TABLE IF NOT EXISTS `Category` (
+  `CatID` int(10) unsigned NOT NULL,
+  `Name` varchar(15) NOT NULL,
+  `Desc` varchar(100),
+  PRIMARY KEY (`CatID`)
+  ) DEFAULT CHARSET=utf8;
+  
+INSERT INTO `Category` VALUES
+('1','ACTOR',NULL),
+('2','TorActor',NULL),
+('3','MatchActor',NULL),
+('4','Event',NULL);
+  
+CREATE TABLE IF NOT EXISTS `Type` (
+  `TypeID` int(10) unsigned NOT NULL,
+  `CatID` int(10) unsigned NOT NULL,
+  `Name` varchar(15) NOT NULL,
+  `Desc` varchar(100),
+  PRIMARY KEY (`TypeID`),
+  Foreign KEY (CatID) REFERENCES Category(CatID)
+   ) DEFAULT CHARSET=utf8;
+  
+INSERT INTO `Type` VALUES
+('1','1','Student',NULL),
+('2','1','Faculty',NULL),
+('3','1','Staff',NULL),
+('4','2','Player',NULL),
+('5','2','Referee',NULL),
+('6','2','Manager',NULL),
+('7','2','Coach',NULL),
+('8','3','Player',NULL),
+('9','3','Captain',NULL),
+('10','3','Goal keeper',NULL),
+('11','3','Main Refree',NULL),
+('12','3','Asst. Refree',NULL),
+('13','4','Yellow Card',NULL),
+('14','4','Red Card',NULL),
+('15','4','Normal Goal',NULL),
+('16','4','Penalty Goal','Goal by penalty kick'),
+('17','4','Self Goal','Goal on own team');
+
+CREATE TABLE IF NOT EXISTS `Department` (
+  `DeptID` int(10) unsigned NOT NULL,
+  `Code` varchar(4) NOT NULL,
+  `Name` varchar(200) NOT NULL,
+  PRIMARY KEY (`DeptID`)
+  ) DEFAULT CHARSET=utf8;
+  
+INSERT INTO `Department` VALUES
+('1','ICS','Information and Computer Science'),
+('2','SWE','Software Engineering');
+
+
+CREATE TABLE IF NOT EXISTS `Actor` (
+  `KFUPMID` int(10) unsigned NOT NULL,
+  `Fname` varchar(10) NOT NULL,
+  `Lname` varchar(10) NOT NULL,
+  `DeptID` int(10) unsigned NOT NULL,
+  `TypeID` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`KFUPMID`),
+  FOREIGN KEY (DeptID) REFERENCES Department(DeptID),
+  FOREIGN KEY (TypeID) REFERENCES Type(TypeID)
+  ) DEFAULT CHARSET=utf8;
+  INSERT INTO `Actor` VALUES
+  ('1','Naif','Khaleel','1','1'),
+  ('2','Khaled','Abdullah','2','2'),
+  ('3','Naiff','K','1','1'),
+  ('4','Khaledd','A','2','2');
+  
+  CREATE TABLE IF NOT EXISTS `TorActor` (
+  `TorID` int(10) unsigned NOT NULL,
+  `KFUPMID` int(10) unsigned NOT NULL,
+  `TeamID` int(10) unsigned NOT NULL,
+  `TypeID` int(10) unsigned NOT NULL,
+    FOREIGN KEY (TorID) REFERENCES Tournament(TorID),
+    FOREIGN KEY (KFUPMID) REFERENCES Actor(KFUPMID),
+    FOREIGN KEY (TeamID) REFERENCES Team(TeamID),
+    FOREIGN KEY (TypeID) REFERENCES Type(TypeID)
+    ) DEFAULT CHARSET=utf8;
+    
+   INSERT INTO `TorActor` VALUES
+  ('1234','1','1','1'),
+  ('1234','2','1','1'),
+  ('1234','3','1','1'),
+  ('1234','4','2','1'),
+  ('4321','2','2','2');
+  
+  CREATE TABLE IF NOT EXISTS `MatchActor` (
+    `MatchID` int(10) unsigned NOT NULL,
+    `KFUPMID` int(10) unsigned NOT NULL,
+    `TypeID` int(10) unsigned NOT NULL,
+    FOREIGN KEY (MatchID) REFERENCES `Match`(MatchID),
+    FOREIGN KEY (KFUPMID) REFERENCES Actor(KFUPMID),
+    FOREIGN KEY (TypeID) REFERENCES Type(TypeID)
+    ) DEFAULT CHARSET=utf8;
+    
+   INSERT INTO `MatchActor` VALUES
+  ('1','1','1'),
+  ('1','2','2'),
+  ('1','4','1'),
+  ('1','3','2');
+  
+  CREATE TABLE IF NOT EXISTS `Event` (
+    `MatchID` int(10) unsigned NOT NULL,
+    `KFUPMID` int(10) unsigned NOT NULL,
+    `TypeID` int(10) unsigned NOT NULL,
+    `Time` time NOT NULL,
+    FOREIGN KEY (MatchID) REFERENCES `Match`(MatchID),
+    FOREIGN KEY (KFUPMID) REFERENCES Actor(KFUPMID),
+    FOREIGN KEY (TypeID) REFERENCES Type(TypeID)
+    ) DEFAULT CHARSET=utf8;
+    
+    
+    INSERT INTO `Event` VALUES
+   ('1','3','12',time '6:30:0'),
+   ('2','2','11',time '8:30:0'),
+   ('2','1','15',time '6:30:0'),
+   ('2','4','17',time '8:30:0'),
+   ('2','1','16',time '6:30:0'),
+   ('2','4','15',time '8:30:0'),
+   ('2','1','17',time '6:30:0'),
+   ('2','4','16',time '8:30:0');
+   
+   CREATE TABLE IF NOT EXISTS `ContactType` (
+     `ConTypeID` int(10) unsigned NOT NULL,
+     `Name` varchar(15) NOT NULL,
+     `Desc` varchar(150),
+     PRIMARY KEY (`ConTypeID`)
+     ) DEFAULT CHARSET=utf8;
+     
+    INSERT INTO `ContactType` VALUES
+   ('1','Mobile',null),
+   ('2','Land line',null),
+   ('3','Email',null),
+   ('4','Addres',null);
+   
+   
+   CREATE TABLE IF NOT EXISTS `Contact` (
+     `KFUPMID` int(10) unsigned NOT NULL,
+     `ConTypeID` int(10) unsigned NOT NULL,
+     `Value` varchar(25) NOT NULL,
+     FOREIGN KEY (KFUPMID) REFERENCES Actor(KFUPMID),
+     FOREIGN KEY (ConTypeID) REFERENCES ContactType(ConTypeID)
+     ) DEFAULT CHARSET=utf8;
+     
+    INSERT INTO `Contact` VALUES
+    ('1','1','050-0371715'),
+    ('2','3','adam@kfupm.edu.sa');

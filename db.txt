@@ -1,0 +1,586 @@
+import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.paint.Color;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class db extends Application {
+    private Stage stage;
+    Scene loggedIn_scene;
+    Button form2_button= new Button("Add match (form 2)");
+    Button form3_button = new Button("Add goals to a match (form 3)");
+    Button form4_button = new Button("Assign yellow card (form 4)");
+    Button form5_button = new Button("Change field of a match (form 5)");
+    Button logOut_button = new Button("Log out");
+    //
+
+    //ADDED STUFF TO LOGIN SCENE
+    Label login_l1 = new Label("Username:");
+    TextField login_tf1 = new TextField();
+    Label login_l2 = new Label("Password:");
+    TextField login_tf2 = new TextField();
+    String username = "admin";
+    String password = "123";
+    Label login_l3 = new Label("");
+    //
+    //form 2
+    Label form_insertion_indicator = new Label("ADDED");
+    Scene form2_scene;
+    Label form2_l1 = new Label("Match ID:");
+    Label form2_l2 = new Label("Team 1 ID:");
+    Label form2_l3 = new Label("Team 2 ID:");
+    Label form2_l4 = new Label("Field ID:");
+    Label form2_l5 = new Label("Date:");
+    Label form2_l6 = new Label("Time:");
+    Label form2_l7 = new Label("Team 1 Goals:");
+    Label form2_l8 = new Label("Team 2 Goals:");
+    Label form2_l9 = new Label("Comments:");
+    TextField form2_tf1 = new TextField();
+    TextField form2_tf2 = new TextField();
+    TextField form2_tf3 = new TextField();
+    TextField form2_tf4 = new TextField();
+    TextField form2_tf5 = new TextField();
+    TextField form2_tf6 = new TextField();
+    TextField form2_tf7 = new TextField();
+    TextField form2_tf8 = new TextField();
+    TextField form2_tf9 = new TextField();
+    Button form_backButton = new Button("back");
+    Button form2_addButton = new Button("Add");
+    Button form2_logOutButton = new Button("log out");
+    VBox form2_root;
+    //
+    //form 3
+    Scene form3_scene;
+    Label form3_l1 = new Label("Match ID:");
+    Label form3_l2 = new Label("Team 1 Goals:");
+    Label form3_l3 = new Label("Team 2 Goals:");
+    TextField form3_tf1 = new TextField();
+    TextField form3_tf2 = new TextField();
+    TextField form3_tf3 = new TextField();
+    Button form3_addButton = new Button("Add");
+    VBox form3_root;
+    Button form3_backButton = new Button("Back");
+    Button form3_logOutButton =new Button("logout");
+
+    //form 4
+    Scene form4_scene;
+    Label form4_l1 = new Label("Match ID:");
+    Label form4_l2= new Label("KFUPM ID:");
+    Label form4_l3 =  new Label("Time:");
+    TextField form4_tf1= new TextField();
+    TextField form4_tf2= new TextField();
+    TextField form4_tf3= new TextField();
+    Button form4_addButton = new Button("Add");
+    Button form4_backButton = new Button("back");
+    Button form4_logOutButton = new Button("logout");
+    VBox form4_root = new VBox();
+
+    //form 5
+    Scene form5_scene;
+    Label form5_l1 = new Label("Match ID:");
+    Label form5_l2 =  new Label("Field ID");
+    TextField form5_tf1 = new TextField();
+    TextField form5_tf2 = new TextField();
+    Button form5_addButton= new Button("Add");
+    Button form5_backButton = new Button("back");
+    Button form5_logOutButton = new Button("logout");
+    VBox form5_root= new VBox();
+    //LOGIN AND BROWSE scenes
+    Button browseButton, adminLoginButton;
+    Scene loginScene, browseScene;
+    // REFEREE BROWSE SCENE
+    Scene refBrowseScene;
+    ListView<String> list_of_referees;
+    TableView referee_matches_table;
+    TableColumn matchesCol;
+    //
+    //Report 2 Scene
+    Scene report2_scene;
+    Label report2_lb = new Label("Players who scored more than 2 goals");
+    TableView report2Table = new TableView<>();
+    TableColumn colkID_report2 = new TableColumn("KFUPM ID");
+    TableColumn colfname_report2 = new TableColumn("First Name");
+    TableColumn collname_report2 = new TableColumn("Last Name");
+    TableColumn colDID_report2 = new TableColumn("Department");
+    TableColumn colTypeID_report2 = new TableColumn("Type");
+    Button backButton_report2 = new Button("Back");
+    //
+    //Report 3 Scene
+    Scene report3_scene;
+    Label report3_lb = new Label("Match List");
+    TableView report3Table = new TableView();
+    TableColumn colMatchId_report3 = new TableColumn("Match ID");
+    TableColumn colDate_report3 = new TableColumn("Date");
+    TableColumn colField_report3 = new TableColumn("Field ID");
+    TableColumn colTeam1_report3 = new TableColumn("Team 1");
+    TableColumn colTeam2_report3 = new TableColumn("Team 2");
+    Button backButton_report3 = new Button("Go Back");
+    //
+    // Report 4 Scene
+    Scene report4_scene;
+    Label report4_lb1 = new Label("Team ID:"), report4_lb2 = new Label("Match ID:");
+    TextField report4_tf1 = new TextField("Insert here"), report4_tf2 = new TextField("Insert here");
+    Button report4_search_button = new Button("Search"), backButton_report4 = new Button("Go Back");
+    TableView report4Table = new TableView();
+    TableColumn colkID_report4 = new TableColumn("KFUPM ID"), colfname_report4 = new TableColumn("First Name"), collName_report4 = new TableColumn("Last Name"), colDepID_report4 = new TableColumn("Department ID"), coltypeID_report4 = new TableColumn("Type ID");
+    //
+
+    //Report5
+    Scene report5_scene;
+    Label report5_l1 = new Label("List of Matches By Referee"), report5_l2 = new Label("KFUPM ID:");
+    TextField report5_tf = new TextField();
+    Button report5_searchButton = new Button("Search"), backButton_report5 = new Button("Go Back");
+    TableView report5Table = new TableView();
+    TableColumn colMatchID_report5 = new TableColumn("Match ID"), colTeam1ID_report5 = new TableColumn("Team 1 ID"), colTeam2ID_report5 = new TableColumn("Team 2 ID"), colFieldID_report5 = new TableColumn("Field ID"), colDate_report5 = new TableColumn("Date"), colTime_report5 = new TableColumn("Time"), colTeam1Goals_report5 = new TableColumn("Team 1 Goals"), colTeam2Goals_report5 = new TableColumn("Team 2 Goals");
+
+    //
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage window) {
+        this.stage = window;
+        //LOGIN SCREEN SCENE (1)
+        Label l1 = new Label("KFUPM Soccer Tournament Database");
+        window.setTitle("KFUPM Soccer Tournament Database");
+        browseButton = new Button("Browse");
+        adminLoginButton = new Button("Admin Login");
+        BorderPane root = new BorderPane();
+        VBox vBox = new VBox();
+        vBox.getChildren().addAll(l1, browseButton, adminLoginButton);
+        vBox.setAlignment(Pos.CENTER);
+        browseButton.setOnAction(e -> window.setScene(browseScene));
+        loginScene = new Scene(vBox, 500, 500);
+        window.setScene(loginScene);
+        window.show();
+        vBox.setSpacing(10);
+        l1.setFont(new Font("Impact", 20));
+
+        //
+        HBox login_hb = new HBox();
+        login_hb.setAlignment(Pos.CENTER);
+        login_hb.setSpacing(10);
+        login_hb.getChildren().addAll(login_l1,login_tf1,login_l2,login_tf2);
+        vBox.getChildren().addAll(login_hb,login_l3);
+        adminLoginButton.setOnAction(e-> loginMethod());
+
+        //
+        VBox root_loggedIn = new VBox();
+        root_loggedIn.getChildren().addAll(form2_button,form3_button,form4_button,form5_button,logOut_button);
+        root_loggedIn.setSpacing(10);
+        root_loggedIn.setAlignment(Pos.CENTER);
+        loggedIn_scene= new Scene(root_loggedIn,500,500);
+        logOut_button.setOnAction(e-> logOutMethod());
+        form2_button.setOnAction(e -> window.setScene(form2_scene));
+        form3_button.setOnAction(e->window.setScene(form3_scene));
+        form4_button.setOnAction(e-> window.setScene(form4_scene));
+        form5_button.setOnAction(e-> window.setScene(form5_scene));
+        form_backButton.setOnAction(e->window.setScene(loggedIn_scene));
+        form2_addButton.setOnAction(e-> {
+            try {
+                form2Method();
+            } catch (ParseException parseException) {
+                parseException.printStackTrace();
+            }
+        });
+        form_insertion_indicator.setTextFill(Color.GREEN);
+
+        //FORM 2
+        HBox form2_hb1 = new HBox();
+        HBox form2_hb2 = new HBox();
+        HBox form2_hb3 = new HBox();
+        form2_hb1.getChildren().addAll(form2_l1,form2_tf1,form2_l2,form2_tf2,form2_l3,form2_tf3);
+        form2_hb2.getChildren().addAll(form2_l4,form2_tf4,form2_l5,form2_tf5,form2_l6,form2_tf6);
+        form2_hb3.getChildren().addAll(form2_l7,form2_tf7,form2_l8,form2_tf8,form2_l9,form2_tf9);
+        form2_hb1.setAlignment(Pos.CENTER);
+        form2_hb1.setSpacing(7);
+        form2_hb2.setAlignment(Pos.CENTER);
+        form2_hb2.setSpacing(7);
+        form2_hb3.setAlignment(Pos.CENTER);
+        form2_hb3.setSpacing(7);
+        form2_root = new VBox();
+        form2_root.getChildren().addAll(form2_hb1,form2_hb2,form2_hb3,form2_addButton,form_backButton,form2_logOutButton);
+        form2_root.setSpacing(10);
+        form_backButton.setOnAction(e->window.setScene(loggedIn_scene));
+        form2_root.setAlignment(Pos.CENTER);
+        form2_scene= new Scene(form2_root,800,500);
+        //
+        //form 3
+        form3_root= new VBox();
+        form3_root.setAlignment(Pos.CENTER);
+        form3_root.setSpacing(6);
+        form3_root.getChildren().addAll(form3_l1,form3_tf1,form3_l2,form3_tf2,form3_l3,form3_tf3,form3_addButton,form3_backButton,form3_logOutButton);
+        form3_scene= new Scene(form3_root,500,500);
+        form3_backButton.setOnAction(e-> window.setScene(loggedIn_scene));
+        form3_logOutButton.setOnAction(e-> window.setScene(loginScene));
+        form3_addButton.setOnAction(e-> form3Method());
+
+
+        //form 4
+        form4_root.setSpacing(6);
+        form4_root.setAlignment(Pos.CENTER);
+        form4_root.getChildren().addAll(form4_l1,form4_tf1,form4_l2,form4_tf2,form4_l3,form4_tf3,form4_addButton,form4_backButton,form4_logOutButton);
+        form4_scene= new Scene(form4_root,500,500);
+        form4_backButton.setOnAction(e->window.setScene(loggedIn_scene));
+        form4_logOutButton.setOnAction(e->window.setScene(loginScene));
+        form4_addButton.setOnAction(e-> form4Method());
+
+        //form 5
+        form5_root.setAlignment(Pos.CENTER);
+        form5_root.setSpacing(6);
+        form5_root.getChildren().addAll(form5_l1,form5_tf1,form5_l2,form5_tf2,form5_addButton,form5_backButton,form5_logOutButton);
+        form5_scene = new Scene(form5_root,500,500);
+        form5_backButton.setOnAction(e->window.setScene(loggedIn_scene));
+        form5_logOutButton.setOnAction(e->window.setScene(loginScene));
+        form5_addButton.setOnAction(e->form5Method());
+        //BROWSE SCENE
+        Button backButton = new Button("Go Back");
+        backButton.setOnAction(e -> window.setScene(loginScene));
+        VBox vbox2 = new VBox();
+        Button button_browse_referees = new Button("Browse Referees(report 5)");
+        Button button_report2 = new Button("Players who scored more than 2 goals(report 2)");
+        Button button_browse_teams = new Button("Browse Teams(not yet made)");
+        Button button_browse_matches = new Button("Match List(report 3)");
+        Button button_browse_Players = new Button("Browse Players in a team and match(report 4)");
+        Label browsingOptions = new Label("Pick a browsing option:");
+        vbox2.getChildren().addAll(browsingOptions, button_browse_teams, button_report2, button_browse_matches, button_browse_Players, button_browse_referees, backButton);
+        vbox2.setAlignment(Pos.CENTER);
+        backButton.setAlignment(Pos.BOTTOM_CENTER);
+        vbox2.setSpacing(10);
+        browsingOptions.setFont(new Font("impact", 16));
+        button_browse_referees.setFont(new Font("Arial", 16));
+        button_browse_matches.setFont(new Font("Arial", 16));
+        button_browse_teams.setFont(new Font("Arial", 16));
+        button_report2.setFont(new Font("Arial", 16));
+        backButton.setFont(new Font("Arial", 14));
+        button_browse_Players.setFont(new Font("Arial", 16));
+
+        browseScene = new Scene(vbox2, 500, 500);
+        //BROWSE BUTTON FUNCTIONS
+        button_browse_referees.setOnAction(e -> window.setScene(report5_scene));
+        button_report2.setOnAction(e -> report2Table.setItems(report2Method()));
+        button_browse_teams.setOnAction(e -> window.setScene(loginScene));
+        button_browse_matches.setOnAction(e -> report3Table.setItems(report3Method()));
+        button_browse_Players.setOnAction(e -> window.setScene(report4_scene));
+
+
+        //Report 2 Scene
+        report2Table.setEditable(true);
+        report2Table.getColumns().addAll(colkID_report2, colfname_report2, collname_report2, colDID_report2, colTypeID_report2);
+        // code for inserting into table
+        colkID_report2.setCellValueFactory(new PropertyValueFactory<>("kfupmID"));
+        colDID_report2.setCellValueFactory(new PropertyValueFactory<>("depID"));
+        colfname_report2.setCellValueFactory(new PropertyValueFactory<>("Fname"));
+        collname_report2.setCellValueFactory(new PropertyValueFactory<>("Lname"));
+        colTypeID_report2.setCellValueFactory(new PropertyValueFactory<>("typeID"));
+
+
+        //
+        backButton_report2.setOnAction(e -> window.setScene(browseScene));
+        VBox root_report2 = new VBox();
+        root_report2.setSpacing(5);
+        root_report2.setAlignment(Pos.CENTER);
+        root_report2.getChildren().addAll(report2_lb, report2Table, backButton_report2);
+        report2_scene = new Scene(root_report2, 500, 500);
+        report2_lb.setFont(new Font("Arial", 20));
+        backButton_report2.setFont(new Font("Arial", 16));
+        //
+        //Report 3 Scene
+        report3Table.setEditable(true);
+        report3Table.getColumns().addAll(colMatchId_report3, colDate_report3, colField_report3, colTeam1_report3, colTeam2_report3);
+        //
+        colDate_report3.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colMatchId_report3.setCellValueFactory(new PropertyValueFactory<>("matchID"));
+        colField_report3.setCellValueFactory(new PropertyValueFactory<>("fieldID"));
+        colTeam1_report3.setCellValueFactory(new PropertyValueFactory<>("team1ID"));
+        colTeam2_report3.setCellValueFactory(new PropertyValueFactory<>("team2ID"));
+
+        backButton_report3.setOnAction(e -> window.setScene(browseScene));
+        VBox root_report3 = new VBox();
+        root_report3.setSpacing(5);
+        root_report3.setAlignment(Pos.CENTER);
+        root_report3.getChildren().addAll(report3_lb, report3Table, backButton_report3);
+        report3_scene = new Scene(root_report3, 500, 500);
+        report3_lb.setFont(new Font("Arial", 20));
+        backButton_report3.setFont(new Font("Arial", 16));
+
+        //
+        //Report 4 Scene
+        report4_search_button.setOnAction(e-> report4Table.setItems(report4Method()));
+        report4Table.setEditable(true);
+        report4Table.getColumns().addAll(colkID_report4, colfname_report4, collName_report4, colDepID_report4, coltypeID_report4);
+        //
+        colkID_report4.setCellValueFactory(new PropertyValueFactory<>("kfupmID"));
+        colDepID_report4.setCellValueFactory(new PropertyValueFactory<>("depID"));
+        colfname_report4.setCellValueFactory(new PropertyValueFactory<>("Fname"));
+        collName_report4.setCellValueFactory(new PropertyValueFactory<>("Lname"));
+        coltypeID_report4.setCellValueFactory(new PropertyValueFactory<>("typeID"));
+        //
+        backButton_report4.setOnAction(e -> window.setScene(browseScene));
+        HBox hb_report4 = new HBox();
+        hb_report4.getChildren().addAll(report4_lb1, report4_tf1, report4_lb2, report4_tf2, report4_search_button);
+        hb_report4.setAlignment(Pos.CENTER);
+        hb_report4.setSpacing(5);
+        VBox root_report4 = new VBox();
+        root_report4.setSpacing(5);
+        root_report4.setAlignment(Pos.CENTER);
+        root_report4.getChildren().addAll(hb_report4, report4Table, backButton_report4);
+        report4_scene = new Scene(root_report4, 500, 500);
+
+        //
+        //Report 5 scene
+        report5Table.setEditable(true);
+        report5Table.getColumns().addAll(colMatchID_report5, colTeam1ID_report5, colTeam2ID_report5, colFieldID_report5, colDate_report5, colTime_report5, colTeam1Goals_report5, colTeam2Goals_report5);
+        //
+        colDate_report5.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colMatchID_report5.setCellValueFactory(new PropertyValueFactory<>("matchID"));
+        colFieldID_report5.setCellValueFactory(new PropertyValueFactory<>("fieldID"));
+        colTeam1ID_report5.setCellValueFactory(new PropertyValueFactory<>("team1ID"));
+        colTeam2ID_report5.setCellValueFactory(new PropertyValueFactory<>("team2ID"));
+        colTime_report5.setCellValueFactory(new PropertyValueFactory<>("time"));
+        colTeam1Goals_report5.setCellValueFactory(new PropertyValueFactory<>("team1Goals"));
+        colTeam2Goals_report5.setCellValueFactory(new PropertyValueFactory<>("team2Goals"));
+
+        report5_searchButton.setOnAction(e -> report5Table.setItems(report5Method()));
+        //
+        backButton_report5.setOnAction(e -> window.setScene(browseScene));
+        HBox report5_hb = new HBox();
+        report5_hb.getChildren().addAll(report5_l2, report5_tf, report5_searchButton);
+        report5_hb.setSpacing(5);
+        report5_hb.setAlignment(Pos.CENTER);
+        VBox root_report5 = new VBox();
+        root_report5.getChildren().addAll(report5_l1, report5_hb, report5Table, backButton_report5);
+        root_report5.setSpacing(10);
+        root_report5.setAlignment(Pos.CENTER);
+        report5_scene = new Scene(root_report5, 1000, 700);
+        //
+    }
+
+    private ObservableList<Player> report2Method() {
+        stage.setScene(report2_scene);
+        ObservableList players = FXCollections.observableArrayList();
+
+        //need loop and query that puts players in a Player object and adds them to observable list players
+
+        try {
+            Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project","root","1234");
+            Statement mystmt = myConn.createStatement();
+
+            ResultSet myRs = mystmt.executeQuery("Select * from actor WHERE KFUPMID IN (SELECT KFUPMID FROM event WHERE KFUPMID in (SELECT KFUPMID FROM event WHERE TypeID >14 GROUP BY KFUPMID HAVING COUNT(*) > 2))");
+            while(myRs.next())
+                players.add(new Player(myRs.getString(1), myRs.getString(2), myRs.getString(3), myRs.getString(4), myRs.getString(5)));
+
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+        return players;
+    }
+
+    private ObservableList<Match> report3Method() {
+        stage.setScene(report3_scene);
+        ObservableList matches = FXCollections.observableArrayList();
+
+        //need loop and query that puts players in a Player object and adds them to observable List matches
+        try {
+            Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project","root","1234");
+            Statement mystmt = myConn.createStatement();
+
+            ResultSet myRs = mystmt.executeQuery( "Select MatchID, Date , FieldID , Team1ID , Team2ID from project.match");
+            while(myRs.next())
+                matches.add(new Match(myRs.getString(1),myRs.getString(2),myRs.getString(3),myRs.getString(4),myRs.getString(5)));
+
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+
+
+        return matches;
+    }
+
+    private ObservableList<Player> report4Method() {
+        stage.setScene(report4_scene);
+        ObservableList players = FXCollections.observableArrayList();
+
+        String teamID = report4_tf1.getText();
+        //Team id selected by user
+
+        String matchID = report4_tf2.getText();
+        //match id selected by user
+
+
+
+        try {
+            Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project","root","1234");
+            Statement mystmt = myConn.createStatement();
+
+            ResultSet myRs = mystmt.executeQuery( "SELECT * FROM project.actor WHERE KFUPMID IN (SELECT KFUPMID FROM project.matchactor WHERE MatchID = "+matchID+" and KFUPMID in (Select KFUPMID FROM project.toractor where TeamID = "+teamID+"))");
+            while(myRs.next())
+               players.add(new Player(myRs.getString(1),myRs.getString(2),myRs.getString(3),myRs.getString(4),myRs.getString(5)));
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+
+        //example of adding
+
+
+        return players;
+    }
+    private ObservableList<Match> report5Method(){
+        stage.setScene(report5_scene);
+        ObservableList matches = FXCollections.observableArrayList();
+        String kfupmID = report5_tf.getText();
+        try {
+            Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project","root","1234");
+            Statement mystmt = myConn.createStatement();
+
+            ResultSet myRs = mystmt.executeQuery( "SELECT * FROM project.match WHERE MatchID in (Select MatchID FROM project.event WHERE KFUPMID IN (SELECT KFUPMID FROM project.event WHERE KFUPMID = "+kfupmID+" and TypeID BETWEEN 11 and 12))");
+            while(myRs.next())
+                matches.add(new Match(myRs.getString(1),myRs.getString(5),myRs.getString(4),myRs.getString(2),myRs.getString(3),myRs.getString(6),myRs.getString(7),myRs.getString(8)));
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+
+
+        return matches;
+    }
+    private void loginMethod(){
+        if (login_tf1.getText().equals(username) & login_tf2.getText().equals(password) ){
+
+            login_l3.setText("");
+            stage.setScene(loggedIn_scene);
+            login_tf1.setText("");
+            login_tf2.setText("");
+
+        }
+        else {
+            login_l3.setText("Invalid username or password");
+            login_l3.setTextFill(Color.RED);
+        }
+    }
+    private void logOutMethod(){
+        login_tf1.setText("");
+        login_tf2.setText("");
+        stage.setScene(loginScene);
+
+    }
+    private void form2Method() throws ParseException {
+        String matchID = form2_tf1.getText();
+        String team1ID = form2_tf2.getText();
+        String team2ID = form2_tf3.getText();
+        String fieldID = form2_tf4.getText();
+        String date = form2_tf5.getText();
+        String time = form2_tf6.getText();
+        String team1Goals = form2_tf7.getText();
+        String team2Goals = form2_tf8.getText();
+        String comment = form2_tf9.getText();
+
+
+
+
+        //need code that validates input object type and inserts them into Database
+        // if input is invalid it should not do the insertion query
+        try {
+            Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project","root","1234");
+            Statement mystmt = myConn.createStatement();
+            String Form2 = "Insert into project.match "+"Values (?,?,?,?,?,?,?,?,?)";
+            PreparedStatement form2 = myConn.prepareStatement(Form2);
+            form2.setInt(1, Integer.parseInt(matchID));
+            form2.setInt(2, Integer.parseInt(team1ID));
+            form2.setInt(3, Integer.parseInt(team2ID));
+            form2.setInt(4, Integer.parseInt(fieldID));
+            form2.setDate(5,  java.sql.Date.valueOf(date));
+            form2.setTime(6, java.sql.Time.valueOf(time));
+            form2.setInt(7, Integer.parseInt(team1Goals));
+            form2.setInt(8, Integer.parseInt(team2Goals));
+            form2.setString(9, comment);
+            form2.execute();
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+
+    }
+    private void form3Method(){
+        String matchID = form3_tf1.getText();
+        String team1Goals = form3_tf2.getText();
+        String team2Goals = form3_tf3.getText();
+
+
+        try {
+            Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project","root","1234");
+            Statement mystmt = myConn.createStatement();
+            String Form3 = "update project.match set Team1Goals = ? , Team2Goals = ? Where MatchID = ?";
+            PreparedStatement form3 = myConn.prepareStatement(Form3);
+            form3.setInt(1, Integer.parseInt(team1Goals));
+            form3.setInt(2, Integer.parseInt(team2Goals));
+            form3.setInt(3, Integer.parseInt(matchID));
+            form3.execute();
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+    private void form4Method(){
+        String MatchID = form4_tf1.getText();
+        String kfupmID = form4_tf2.getText();
+        String time = form4_tf3.getText();
+        Integer type = 13;
+
+        try {
+            Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project","root","1234");
+            Statement mystmt = myConn.createStatement();
+            String Form4 = "Insert into project.event "+"Values (?,?,?,?)";
+            PreparedStatement form4 = myConn.prepareStatement(Form4);
+            form4.setInt(1, Integer.parseInt(MatchID));
+            form4.setInt(2, Integer.parseInt(kfupmID));
+            form4.setInt(3, 13);
+            form4.setTime(4, java.sql.Time.valueOf(time));
+            form4.execute();
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+    private void form5Method(){
+        String matchID = form5_tf1.getText();
+        String fieldID = form5_tf2.getText();
+
+        try {
+            Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/project","root","1234");
+            Statement mystmt = myConn.createStatement();
+            String Form5 = "update project.match set FieldID = ? where MatchID= ?";
+            PreparedStatement form5 = myConn.prepareStatement(Form5);
+            form5.setInt(1, Integer.parseInt(fieldID));
+            form5.setInt(2, Integer.parseInt(matchID));
+            form5.execute();
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+}
